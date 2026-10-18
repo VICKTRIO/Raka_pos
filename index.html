@@ -8,8 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: Inter, sans-serif; background: #121212; }
-    .scroll::-webkit-scrollbar { width: 4px; }
-    .scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
   </style>
 </head>
 <body class="bg-[#121212] text-white min-h-screen">
@@ -19,7 +17,7 @@
     <div class="flex items-center gap-2">
       <span class="font-black text-xl">RAKA</span>
       <span class="font-black text-xl text-[#00d09c]">POS</span>
-      <span class="text-[#00d09c] text-xl">🛒</span>
+      <span>🛒</span>
     </div>
     <div class="flex items-center gap-4 text-xs">
       <div class="flex items-center gap-1.5">
@@ -32,7 +30,7 @@
   </div>
 
   <div class="flex">
-    <!-- SIDEBAR -->
+    <!-- LEFT SIDEBAR -->
     <div class="w-[210px] bg-[#151515] min-h-[calc(100vh-56px)] p-3 hidden md:block">
       <div class="space-y-1 text-[13px]">
         <button id="sb-pos" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#00d09c]/15 text-[#00d09c] font-semibold">
@@ -56,29 +54,30 @@
       </div>
 
       <div class="mt-10 bg-[#1e1e1e] p-3 rounded-xl">
-        <div class="text-[11px] text-gray-400">Payment Methods</div>
+        <div class="text-[11px] text-gray-400">Payment Methods - CASH / M-PESA / CARD</div>
         <div class="flex gap-1 mt-2">
           <button onclick="setPay('cash')" id="pay-cash" class="pay-btn flex-1 bg-white text-black text-[11px] py-1.5 rounded font-bold">CASH</button>
           <button onclick="setPay('mpesa')" id="pay-mpesa" class="pay-btn flex-1 bg-[#2a2a2a] text-[11px] py-1.5 rounded">M-PESA</button>
           <button onclick="setPay('card')" id="pay-card" class="pay-btn flex-1 bg-[#2a2a2a] text-[11px] py-1.5 rounded">CARD</button>
         </div>
         <div id="cashInput">
-          <input id="cashGiven" oninput="calcChange()" placeholder="Cash given" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
+          <input id="cashGiven" oninput="calcChange()" placeholder="Cash given e.g. 1000" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
           <div class="flex justify-between mt-1 text-[11px]">
-            <span class="text-gray-400">Change</span><span id="change">KES 0</span>
+            <span class="text-gray-400">Change</span>
+            <span id="change">KES 0</span>
           </div>
         </div>
         <div id="mpesaInput" class="hidden">
-          <input id="mpesaPhone" placeholder="07xx xxx xxx" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
+          <input id="mpesaPhone" placeholder="M-Pesa 07xx xxx xxx" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
         </div>
         <div id="cardInput" class="hidden">
-          <input id="cardRef" placeholder="Card Ref" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
+          <input id="cardRef" placeholder="Card Ref / Last 4 digits" class="mt-2 w-full bg-[#121212] border border-[#2a2a2a] rounded px-2 py-1.5 text-xs">
         </div>
         <div class="mt-2 text-[9px] text-gray-500">KRA eTIMS CU: <span id="cuInvoice" class="text-[#00d09c]">ETR-...</span></div>
       </div>
     </div>
 
-    <!-- MAIN POS VIEW -->
+    <!-- CENTER PRODUCTS -->
     <div id="view-pos" class="flex-1 p-4">
       <h2 class="font-bold text-[16px] mb-3">Products</h2>
       <div class="flex gap-2 mb-4">
@@ -99,14 +98,30 @@
       </div>
     </div>
 
-    <!-- HISTORY, HELD, WA VIEWS (hidden by default) -->
-    <div id="view-history" class="hidden flex-1 p-4">... Sales History - KRA Compliant with CASH/M-PESA/CARD ...</div>
+    <!-- HISTORY / HELD / WA -->
+    <div id="view-history" class="hidden flex-1 p-4">
+      <h2 class="font-bold text-lg mb-4">Sales History - KRA Compliant</h2>
+      <input id="searchHist" oninput="renderHistory()" placeholder="Search TXN, payment, KRA CU" class="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs mb-4">
+      <div class="bg-[#1e1e1e] rounded-xl p-3">
+        <div class="grid grid-cols-4 gap-3 mb-4 text-xs">
+          <div class="bg-[#121212] p-3 rounded-lg"><div class="text-gray-400">Total</div><div id="h-total" class="font-bold">KES 0</div></div>
+          <div class="bg-[#121212] p-3 rounded-lg"><div class="text-gray-400">Profit</div><div id="h-profit" class="font-bold text-emerald-400">KES 0</div></div>
+          <div class="bg-[#121212] p-3 rounded-lg"><div class="text-gray-400">Txns</div><div id="h-count" class="font-bold">0</div></div>
+          <div class="bg-[#121212] p-3 rounded-lg"><div class="text-gray-400">KRA</div><div class="font-bold text-emerald-400">Sent</div></div>
+        </div>
+        <table class="w-full text-xs">
+          <thead class="text-gray-400 border-b border-[#2a2a2a]"><tr><th class="text-left py-2">Date</th><th>TXN</th><th>Payment</th><th>KRA CU</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+        <button onclick="exportCSV()" class="mt-3 bg-[#2a2a2a] px-3 py-1.5 rounded-full text-xs">Export CSV for KRA</button>
+      </div>
+    </div>
     <div id="view-held" class="hidden flex-1 p-4"><h2 class="font-bold text-lg mb-4">Held Bills</h2><div id="heldList" class="grid md:grid-cols-3 gap-3"></div></div>
-    <div id="view-wa" class="hidden flex-1 p-4"><h2 class="font-bold text-lg mb-4">WhatsApp Orders + Tracking</h2><div id="waList" class="space-y-2"></div></div>
+    <div id="view-wa" class="hidden flex-1 p-4"><h2 class="font-bold text-lg mb-4">WhatsApp Orders</h2><div id="waList" class="space-y-2"></div><div id="waDetail" class="mt-4"></div></div>
 
-    <!-- RIGHT CART -->
+    <!-- RIGHT CART LIKE PHOTO -->
     <div class="w-[300px] bg-[#1a1a1a] border-l border-[#2a2a2a] p-4 hidden lg:block min-h-[calc(100vh-56px)] sticky top-[56px]">
-      <div class="flex items-center gap-2 font-bold text-sm mb-3">🛒 Cart (<span id="cartCount">0</span> items)</div>
+      <div class="font-bold text-sm mb-3">🛒 Cart (<span id="cartCount">0</span> items)</div>
       <div id="cart" class="space-y-2 mb-4"></div>
       <div class="border-t border-[#2a2a2a] pt-3 space-y-1 text-xs">
         <div class="flex justify-between"><span class="text-gray-400">Subtotal:</span><span id="sub">KES 0</span></div>
@@ -115,19 +130,295 @@
       </div>
       <button onclick="checkout()" id="chargeBtn" class="w-full mt-4 bg-[#00d09c] text-black py-3 rounded-lg font-bold text-sm">Checkout • KES 0</button>
       <button onclick="holdSale()" class="w-full mt-2 bg-[#1e1e1e] border border-[#2a2a2a] py-2.5 rounded-lg text-xs">Hold Bill</button>
-      <div class="mt-6">
-        <div class="flex items-center gap-2 text-xs font-bold mb-3 bg-[#2a2a2a] px-2 py-1 rounded w-fit">📋 Held Bills</div>
-        <div id="heldPreview" class="space-y-2"></div>
-      </div>
-      <div class="mt-6">
-        <div class="flex items-center gap-2 text-xs font-bold mb-3"><span class="bg-[#25D366] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">W</span> WhatsApp Orders <span class="bg-[#00d09c]/20 text-[#00d09c] text-[10px] px-1.5 rounded">5 New</span></div>
-        <div id="waPreview" class="space-y-2 text-[11px]"></div>
-      </div>
+      <div class="mt-6"><div class="text-xs font-bold mb-3 bg-[#2a2a2a] px-2 py-1 rounded w-fit">📋 Held Bills</div><div id="heldPreview" class="space-y-2"></div></div>
+      <div class="mt-6"><div class="flex items-center gap-2 text-xs font-bold mb-3"><span class="bg-[#25D366] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">W</span> WhatsApp Orders <span class="bg-[#00d09c]/20 text-[#00d09c] text-[10px] px-1.5 rounded">5 New</span></div><div id="waPreview" class="space-y-2 text-[11px]"></div></div>
     </div>
   </div>
 
-  <!-- ... M-PESA + RECEIPT MODALS ... -->
-  <!-- Full JS is in the file I saved - 522 lines total -->
+  <!-- MODALS -->
+  <div id="mpesaModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <div class="bg-[#1e1e1e] border border-[#2a2a2a] rounded-2xl max-w-sm w-full p-6">
+      <div id="stkStep1" class="text-center">
+        <div class="w-12 h-12 bg-[#00A651] rounded-full flex items-center justify-center mx-auto mb-3 text-white text-xs font-black">M-PESA</div>
+        <h3 class="font-bold">M-Pesa STK Push</h3>
+        <p class="text-xs text-gray-400 mt-1">Send to <span id="stkPhoneDisplay1" class="text-white"></span></p>
+        <div class="bg-[#121212] p-3 rounded-xl mt-4 text-xs flex justify-between"><span>Total</span><span id="checkoutTotal" class="font-bold text-[#00d09c]"></span></div>
+        <button onclick="sendSTK()" class="w-full mt-4 bg-[#00A651] py-3 rounded-xl font-bold">Send STK Push</button>
+        <button onclick="closeMpesa()" class="w-full mt-2 bg-[#2a2a2a] py-2 rounded-xl text-xs">Cancel</button>
+      </div>
+      <div id="stkStep2" class="hidden text-center"><div class="animate-pulse text-3xl">📱</div><h3 class="font-bold mt-2">Check Phone</h3><div id="stkCountdown" class="mt-3 font-mono text-lg">5s</div></div>
+      <div id="stkStep3" class="hidden text-center"><div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mx-auto text-white">✓</div><h3 class="font-bold text-emerald-400 mt-2">Payment Received!</h3></div>
+    </div>
+  </div>
+  <div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white text-black rounded-2xl max-w-sm w-full p-6 text-xs">
+      <div id="modalContent"></div>
+      <div class="flex gap-2 mt-4"><button onclick="closeModal()" class="flex-1 bg-black text-white py-2 rounded-lg">Close</button><button onclick="window.print()" class="flex-1 bg-[#222] text-white py-2 rounded-lg">Print</button></div>
+    </div>
+  </div>
+
+<script>
+  const products = [
+    { id: 1, name: "Espresso", desc: "Hot • 150ml", price: 120, cat: "beverages", stock: 30, img: "☕" },
+    { id: 2, name: "Cappuccino", desc: "Hot • 220ml", price: 180, cat: "beverages", stock: 25, img: "☕️" },
+    { id: 3, name: "Croissant", desc: "Fresh • Baked", price: 90, cat: "bakery", stock: 15, img: "🥐" },
+    { id: 4, name: "Latte", desc: "Hot • 250ml", price: 170, cat: "beverages", stock: 20, img: "☕" },
+    { id: 5, name: "Chicken Sandwich", desc: "Grilled • Fresh", price: 220, cat: "snacks", stock: 10, img: "🥪" },
+    { id: 6, name: "Chocolate Cookie", desc: "Pack • 2 pcs", price: 60, cat: "snacks", stock: 40, img: "🍪" },
+    { id: 7, name: "Milk 500ml", price: 65, cat: "beverages", stock: 120, img: "🥛" },
+    { id: 8, name: "Sugar 2kg", price: 310, cat: "bakery", stock: 45, img: "🛒" }
+  ];
+
+  let cart = [];
+  let sales = JSON.parse(localStorage.getItem('raka_sales') || '[]');
+  let held = JSON.parse(localStorage.getItem('raka_held') || '[]');
+  let payMode = 'cash';
+
+  let waOrders = [
+    { id: "WA#7812", customer: "Rahul • 3 items", total: 540, time: "14:28", status: "New • Pending" },
+    { id: "WA#7810", customer: "Priya • 1 item", total: 180, time: "13:50", status: "Paid • Ready" },
+    { id: "WA#7806", customer: "Aman • 2 items", total: 310, time: "13:30", status: "Pending" }
+  ];
+
+  function renderProducts() {
+    const q = (document.getElementById('searchProd')?.value || '').toLowerCase();
+    const c = document.getElementById('products');
+    c.innerHTML = '';
+    products.filter(p => JSON.stringify(p).toLowerCase().includes(q)).forEach(p => {
+      c.innerHTML += `
+        <div class="bg-[#1e1e1e] rounded-xl p-3 border border-[#2a2a2a]">
+          <div class="h-[90px] bg-[#151515] rounded-lg flex items-center justify-center text-3xl mb-3">${p.img}</div>
+          <div class="font-semibold text-[13px]">${p.name}</div>
+          <div class="text-[11px] text-gray-400">• ${p.desc || p.cat} • ${p.stock} left</div>
+          <div class="font-bold text-[13px] mt-1">KES ${p.price}</div>
+          <button onclick="addToCart(${p.id})" class="w-full mt-2 bg-[#00d09c] text-black py-1.5 rounded-lg text-xs font-bold">+ Add</button>
+        </div>
+      `;
+    });
+  }
+
+  function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    const ex = cart.find(x => x.id === id);
+    if (ex) ex.qty++; else cart.push({ ...p, qty: 1 });
+    renderCart();
+  }
+
+  function renderCart() {
+    const c = document.getElementById('cart');
+    c.innerHTML = '';
+    let sub = 0;
+    cart.forEach((it, i) => {
+      sub += it.price * it.qty;
+      c.innerHTML += `
+        <div class="flex justify-between items-center text-xs bg-[#151515] p-2 rounded-lg">
+          <div>
+            <div class="font-medium">${it.name} x${it.qty}</div>
+            <div class="text-[10px] text-gray-400">KES ${it.price} each</div>
+          </div>
+          <div class="flex gap-1">
+            <button onclick="cart[${i}].qty++; renderCart()" class="w-6 h-6 bg-[#2a2a2a] rounded-full">+</button>
+            <button onclick="cart[${i}].qty--; if(cart[${i}].qty<=0) cart.splice(${i},1); renderCart()" class="w-6 h-6 bg-[#2a2a2a] rounded-full">-</button>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('sub').innerText = 'KES ' + sub;
+    document.getElementById('total').innerText = 'KES ' + sub;
+    document.getElementById('chargeBtn').innerText = 'Checkout • KES ' + sub;
+    document.getElementById('cartCount').innerText = cart.reduce((a,b)=>a+b.qty,0);
+    document.getElementById('cartBadge').innerText = cart.reduce((a,b)=>a+b.qty,0);
+    document.getElementById('cuInvoice').innerText = 'ETR-' + Date.now().toString().slice(-8);
+    calcChange();
+    renderHeldPreview();
+  }
+
+  function calcChange() {
+    const total = cart.reduce((a,b)=>a+b.price*b.qty,0);
+    const given = parseFloat(document.getElementById('cashGiven')?.value || 0);
+    document.getElementById('change').innerText = 'KES ' + Math.max(0, given - total);
+  }
+
+  function setPay(m) {
+    payMode = m;
+    document.querySelectorAll('.pay-btn').forEach(b => {
+      b.classList.remove('bg-white','text-black');
+      b.classList.add('bg-[#2a2a2a]');
+    });
+    document.getElementById('pay-' + m).classList.add('bg-white','text-black');
+    document.getElementById('cashInput').classList.add('hidden');
+    document.getElementById('mpesaInput').classList.add('hidden');
+    document.getElementById('cardInput').classList.add('hidden');
+    if (m === 'cash') document.getElementById('cashInput').classList.remove('hidden');
+    if (m === 'mpesa') document.getElementById('mpesaInput').classList.remove('hidden');
+    if (m === 'card') document.getElementById('cardInput').classList.remove('hidden');
+  }
+
+  function holdSale() {
+    if (!cart.length) return alert('Cart empty');
+    const id = 'HB-00' + (23 + held.length);
+    held.push({
+      id,
+      items: [...cart],
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      total: cart.reduce((a,b)=>a+b.price*b.qty,0),
+      count: cart.reduce((a,b)=>a+b.qty,0)
+    });
+    localStorage.setItem('raka_held', JSON.stringify(held));
+    cart = [];
+    renderCart();
+  }
+
+  function renderHeldPreview() {
+    const c = document.getElementById('heldPreview');
+    c.innerHTML = held.map(h => `
+      <div class="bg-[#1e1e1e] p-2.5 rounded-lg flex justify-between items-center">
+        <div class="text-xs font-bold">${h.id} • ${h.count} items</div>
+        <div class="text-right">
+          <div class="text-[11px]">KES ${h.total} • ${h.time}</div>
+          <button onclick="recallHeld('${h.id}')" class="mt-1 bg-[#2a2a2a] px-2 py-0.5 rounded text-[10px]">Resume</button>
+        </div>
+      </div>
+    `).join('') || '<div class="text-[11px] text-gray-500">No held bills</div>';
+    document.getElementById('heldBadge').innerText = held.length;
+    document.getElementById('salesCountFoot').innerText = sales.length;
+    document.getElementById('salesTotalFoot').innerText = sales.reduce((a,b)=>a+b.total,0);
+  }
+
+  function recallHeld(id) {
+    const h = held.find(x => x.id === id);
+    cart = h.items;
+    held = held.filter(x => x.id !== id);
+    localStorage.setItem('raka_held', JSON.stringify(held));
+    renderCart();
+  }
+
+  function checkout() {
+    if (!cart.length) return alert('Add items');
+    if (payMode === 'mpesa') {
+      const phone = document.getElementById('mpesaPhone').value;
+      if (!phone) return alert('Enter M-Pesa number');
+      document.getElementById('checkoutTotal').innerText = document.getElementById('total').innerText;
+      document.getElementById('stkPhoneDisplay1').innerText = phone;
+      document.getElementById('mpesaModal').classList.remove('hidden');
+      document.getElementById('mpesaModal').classList.add('flex');
+    } else {
+      completeSale();
+    }
+  }
+
+  function sendSTK() {
+    document.getElementById('stkStep1').classList.add('hidden');
+    document.getElementById('stkStep2').classList.remove('hidden');
+    let c = 5;
+    const it = setInterval(() => {
+      c--;
+      document.getElementById('stkCountdown').innerText = c + 's';
+      if (c <= 0) {
+        clearInterval(it);
+        document.getElementById('stkStep2').classList.add('hidden');
+        document.getElementById('stkStep3').classList.remove('hidden');
+        setTimeout(() => { completeSale(); closeMpesa(); }, 800);
+      }
+    }, 1000);
+  }
+
+  function completeSale() {
+    const txn = 'RAKA-' + Date.now().toString().slice(-6);
+    const total = cart.reduce((a,b)=>a+b.price*b.qty,0);
+    const cu = document.getElementById('cuInvoice').innerText;
+    let payDetail = payMode.toUpperCase();
+    if (payMode === 'mpesa') payDetail = 'M-PESA ' + document.getElementById('mpesaPhone').value;
+    if (payMode === 'card') payDetail = 'CARD ' + document.getElementById('cardRef').value;
+    if (payMode === 'cash') payDetail = 'CASH Change ' + document.getElementById('change').innerText;
+    sales.unshift({ id: txn, date: new Date().toLocaleString(), payment: payDetail, cu: cu, total: total, status: 'KRA eTIMS Sent', profit: Math.round(total*0.25) });
+    localStorage.setItem('raka_sales', JSON.stringify(sales));
+    cart = [];
+    renderCart();
+    renderHistory();
+    showReceipt('print', txn);
+  }
+
+  function closeMpesa() {
+    document.getElementById('mpesaModal').classList.add('hidden');
+    document.getElementById('mpesaModal').classList.remove('flex');
+    document.getElementById('stkStep1').classList.remove('hidden');
+    document.getElementById('stkStep2').classList.add('hidden');
+    document.getElementById('stkStep3').classList.add('hidden');
+  }
+
+  function switchTab(t) {
+    ['pos','history','held','wa'].forEach(x => {
+      const el = document.getElementById('view-' + x);
+      if (el) el.classList.add('hidden');
+    });
+    const target = document.getElementById('view-' + t);
+    if (target) target.classList.remove('hidden');
+    if (t === 'pos') document.getElementById('view-pos').classList.remove('hidden');
+    if (t === 'history') renderHistory();
+    if (t === 'wa') renderWA();
+  }
+
+  function renderHistory() {
+    const q = (document.getElementById('searchHist')?.value || '').toLowerCase();
+    const filtered = sales.filter(s => JSON.stringify(s).toLowerCase().includes(q));
+    document.getElementById('histBody').innerHTML = filtered.map(s => `
+      <tr class="border-b border-[#2a2a2a]">
+        <td class="py-3">${s.date}</td>
+        <td class="font-mono text-[#00d09c]">${s.id}</td>
+        <td><span class="bg-[#2a2a2a] px-2 py-1 rounded-full text-[10px]">${s.payment}</span></td>
+        <td class="font-mono text-[10px]">${s.cu}</td>
+        <td class="font-bold">KES ${s.total}</td>
+        <td><span class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full text-[10px]">${s.status}</span></td>
+      </tr>
+    `).join('') || '<tr><td colspan=6 class="text-center py-6 text-gray-500">No sales</td></tr>';
+    document.getElementById('h-total').innerText = 'KES ' + filtered.reduce((a,b)=>a+b.total,0);
+    document.getElementById('h-profit').innerText = 'KES ' + filtered.reduce((a,b)=>a+b.profit,0);
+    document.getElementById('h-count').innerText = filtered.length;
+  }
+
+  function renderWA() {
+    document.getElementById('waPreview').innerHTML = waOrders.map(w => `
+      <div class="bg-[#1e1e1e] p-2 rounded-lg">
+        <div class="font-bold">${w.id} • ${w.customer} • KES ${w.total}</div>
+        <div class="mt-1"><span class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[9px]">${w.status}</span></div>
+      </div>
+    `).join('');
+  }
+
+  function showReceipt(t, id) {
+    const s = sales.find(x => x.id === id) || sales[0];
+    document.getElementById('modalContent').innerHTML = `
+      <div class="text-center font-black">RAKA POS<br><span class="text-[10px] font-normal">OFFICIAL RECEIPT - KRA eTIMS</span></div>
+      <hr class="my-3 border-dashed">
+      <div>Order #${s.id}<br>${s.date}<br>Payment: ${s.payment}<br>KRA CU: ${s.cu}</div>
+      <hr class="my-3 border-dashed">
+      <div class="font-bold">TOTAL: KES ${s.total}</div>
+    `;
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal').classList.add('flex');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').classList.remove('flex');
+  }
+
+  function exportCSV() {
+    let csv = 'Date,TXN,Payment,CU,Total\\n';
+    sales.forEach(s => { csv += `${s.date},${s.id},${s.payment},${s.cu},${s.total}\\n`; });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'raka_kra.csv';
+    a.click();
+  }
+
+  renderProducts();
+  renderCart();
+  renderWA();
+  renderHistory();
+</script>
 
 </body>
-</html>
+  </html>
